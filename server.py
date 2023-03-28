@@ -1,6 +1,7 @@
 # import necessary libraries 
 import tensorflow as tf 
 import os
+import cv2
 from six import BytesIO
 import numpy as np
 from PIL import Image
@@ -10,13 +11,15 @@ from flask import request, jsonify
 # create a Flask app object 
 app = flask.Flask(__name__) 
 
- # load model from disk using the saved path of the model file (.pd)  
+# load model from disk using the saved path of the model file (.pd)  
 model = tf.saved_model.load('../TestEnv/models/ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/saved_model/')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    image_np = load_image_into_numpy_array("IMG_20221206_152234.jpg")
-    preds = run_inference_for_single_image(model, image_np)
+    image = request.files['image']
+    image_np = np.fromstring(image.read(), dtype=np.uint8) 
+    img = cv2.imdecode(image_np, cv2.IMREAD_COLOR) 
+    preds = run_inference_for_single_image(model, img)
     print(preds)
     return "{}"
 
@@ -40,7 +43,6 @@ def load_image_into_numpy_array(path):
       (im_height, im_width, 3)).astype(np.uint8)
 
 def run_inference_for_single_image(model, image):
-  image = np.asarray(image)
   # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
   input_tensor = tf.convert_to_tensor(image)
   # The model expects a batch of images, so add an axis with `tf.newaxis`.
