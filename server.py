@@ -1,27 +1,26 @@
 # import necessary libraries 
-import tensorflow as tf 
-import os
+import tensorflow as tf
 import cv2
 from six import BytesIO
 import numpy as np
 from PIL import Image
 import flask 
 from flask import request, jsonify 
+import pandas as pd
   
 # create a Flask app object 
 app = flask.Flask(__name__) 
 
 # load model from disk using the saved path of the model file (.pd)  
-model = tf.saved_model.load('../TestEnv/models/ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/saved_model/')
+model = tf.saved_model.load('ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/saved_model/')
 
-@app.route('/predict', methods=['POST'])
+@app.route('/detect', methods=['POST'])
 def predict():
     image = request.files['image']
     image_np = np.fromstring(image.read(), dtype=np.uint8) 
     img = cv2.imdecode(image_np, cv2.IMREAD_COLOR) 
     preds = run_inference_for_single_image(model, img)
-    print(preds)
-    return "{}"
+    return pd.Series(preds).to_json(orient='values')
 
 def load_image_into_numpy_array(path):
   """Load an image from file into a numpy array.
@@ -76,5 +75,5 @@ def run_inference_for_single_image(model, image):
   return output_dict
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=443, host="0.0.0.0")
     
