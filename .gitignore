@@ -1,2 +1,4 @@
 /ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/
 /venv/
+
+test_img.jpg
