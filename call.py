@@ -4,8 +4,9 @@ from matplotlib.patches import Rectangle
 from PIL import Image
 
 url = "http://prenh22-naufdenb.el.eee.intern:443/detect"
+image = "test_img.jpg"
 
-with open("test_img.jpg", "rb") as file:
+with open(image, "rb") as file:
     # Create a dictionary containing the file as the value
     files = {"image": file}
 
@@ -16,7 +17,7 @@ with open("test_img.jpg", "rb") as file:
     if response.status_code == 200:
         parsed = response.json()
       
-        im = Image.open("test_img.jpg")
+        im = Image.open(image)
 
         # Display the image
         plt.imshow(im)
