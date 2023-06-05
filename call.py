@@ -5,14 +5,13 @@ from PIL import Image
 
 url = "http://prenh22-naufdenb.el.eee.intern:443/detect"
 image = "test_img.jpg"
-post_data = {"deltaX": 20, "deltaY": 20}
 
 with open(image, "rb") as file:
     # Create a dictionary containing the file as the value
     files = {"image": file}
 
     # Send the POST request with the image file and post data as the payload
-    response = requests.post(url, files=files, data=post_data)
+    response = requests.post(url, files=files)
 
     # Check the response status code
     if response.status_code == 200:
