@@ -5,7 +5,7 @@ from six import BytesIO
 import numpy as np
 from PIL import Image
 import flask 
-from flask import request, jsonify 
+from flask import request 
 import pandas as pd
   
 # create a Flask app object 
@@ -17,31 +17,13 @@ model = tf.saved_model.load("ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/saved
 @app.route("/detect", methods=["POST"])
 def predict():
   image = request.files["image"]
-  deltaX = request.form.get("deltaX")
-  deltaY = request.form.get("deltaY")
-
-  if(isinstance(deltaX, str)):
-    deltaX = int(deltaX)
-  else:
-    deltaX = 1
-  
-  if(isinstance(deltaY, str)):
-    deltaY = int(deltaY)
-  else:
-    deltaY = 1
-
-  if(deltaX < 1):
-    deltaX = 1
-
-  if(deltaY < 1):
-    deltaY = 1
 
   image_np = np.frombuffer(image.read(), dtype=np.uint8) 
   img = cv2.imdecode(image_np, cv2.IMREAD_COLOR) 
-  preds = run_inference_for_single_image(model, img, deltaX, deltaY)
+  preds = run_inference_for_single_image(model, img)
   return pd.Series(preds).to_json(orient="values")
 
-def run_inference_for_single_image(model, image, deltaX, deltaY):
+def run_inference_for_single_image(model, image):
   # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
   input_tensor = tf.convert_to_tensor(image)
   # The model expects a batch of images, so add an axis with `tf.newaxis`.
@@ -67,29 +49,7 @@ def run_inference_for_single_image(model, image, deltaX, deltaY):
         "box": boxes[i]
       })
 
-  # Find detection with highest probability in each cluster
-  highest_probability_boxes = find_highest_probability_box(filtered_detections, deltaX, deltaY)
-
-  return highest_probability_boxes
-
-def find_highest_probability_box(detections, delta_x, delta_y):
-  detection_clusters = {}
-  
-  # Group detections into clusters based on delta_x and delta_y
-  for detection in detections:
-    cluster_key = (detection["box"][0] // delta_x, detection["box"][1] // delta_y)
-    if cluster_key not in detection_clusters:
-      detection_clusters[cluster_key] = []
-    detection_clusters[cluster_key].append(detection)
-  
-  # Find detection with highest probability in each cluster
-  highest_score_detections = []
-  for cluster_detections in detection_clusters.values():
-    highest_score_detection = max(cluster_detections, key=lambda box: box["score"])
-    highest_score_detections.append(highest_score_detection)
-  
-  return highest_score_detections
+  return filtered_detections
 
 if __name__ == "__main__":
   app.run(debug=True, port=443, host="0.0.0.0")
-    
