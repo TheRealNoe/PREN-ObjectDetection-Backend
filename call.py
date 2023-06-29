@@ -3,7 +3,10 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from PIL import Image
 
-url = "http://prenh22-naufdenb.el.eee.intern:443/detect"
+url = "https://prenh22-naufdenb.el.eee.intern:443/detect"
+certfile = "keystore/client_cert.pem"
+keyfile = "keystore/client_key.pem"
+
 image = "test_img.jpg"
 
 with open(image, "rb") as file:
@@ -11,7 +14,7 @@ with open(image, "rb") as file:
     files = {"image": file}
 
     # Send the POST request with the image file and post data as the payload
-    response = requests.post(url, files=files)
+    response = requests.post(url, files=files, verify=False, cert=(certfile, keyfile))
 
     # Check the response status code
     if response.status_code == 200:
