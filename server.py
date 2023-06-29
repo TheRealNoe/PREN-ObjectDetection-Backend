@@ -1,13 +1,18 @@
 # import necessary libraries 
 import tensorflow as tf
 import cv2
-from six import BytesIO
 import numpy as np
-from PIL import Image
 import flask 
 from flask import request 
 import pandas as pd
-  
+import ssl
+import os
+
+# openssl variables
+OPENSSL_PW = os.environ.get("OPENSSL_PW")
+OPENSSL_CERTFILE = os.environ.get("OPENSSL_CERTFILE")
+OPENSSL_KEYFILE = os.environ.get("OPENSSL_KEYFILE")
+
 # create a Flask app object 
 app = flask.Flask(__name__) 
 
@@ -51,5 +56,7 @@ def run_inference_for_single_image(model, image):
 
   return filtered_detections
 
-if __name__ == "__main__":
-  app.run(debug=True, port=443, host="0.0.0.0")
+if __name__ == "__main__":   
+  context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+  context.load_cert_chain(certfile=OPENSSL_CERTFILE, keyfile=OPENSSL_KEYFILE, password=OPENSSL_PW) 
+  app.run(port=443, host="0.0.0.0", ssl_context=context)
