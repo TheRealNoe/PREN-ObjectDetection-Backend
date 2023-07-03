@@ -7,7 +7,7 @@ url = "https://prenh22-naufdenb.el.eee.intern:443/detect"
 certfile = "keystore/client_cert.pem"
 keyfile = "keystore/client_key.pem"
 
-image = "test_img.jpg"
+image = "test_data/1.jpg"
 
 with open(image, "rb") as file:
     # Create a dictionary containing the file as the value
