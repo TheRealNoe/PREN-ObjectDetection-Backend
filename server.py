@@ -17,7 +17,7 @@ OPENSSL_KEYFILE = os.environ.get("OPENSSL_KEYFILE")
 app = flask.Flask(__name__) 
 
 # load model from disk using the saved path of the model file (.pd)  
-model = tf.saved_model.load("ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/saved_model/")
+model = tf.saved_model.load("models/3_ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/saved_model/")
 
 @app.route("/detect", methods=["POST"])
 def predict():
