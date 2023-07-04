@@ -7,6 +7,8 @@ url = "https://prenh22-naufdenb.el.eee.intern:443/detect"
 certfile = "keystore/client_cert.pem"
 keyfile = "keystore/client_key.pem"
 
+labels = ["PE-Deckel", "Kronkorken", "Zigarettenstummel", "Wertgegenstand"]
+
 image = "test_data/1.jpg"
 
 with open(image, "rb") as file:
@@ -40,7 +42,13 @@ with open(image, "rb") as file:
             # Create a Rectangle patch
             rect = Rectangle((y, x), height, width, linewidth = 1, edgecolor = "r", facecolor = "none")
             ax.add_patch(rect)
-        
+            
+            # Add text to the image
+            label = labels[detection["class"] - 1]
+            text_x = y + 5
+            text_y = x + width - 20
+            plt.text(text_x, text_y, label, color="r", fontsize=8)
+            
         plt.show()
         
         print(parsed)
